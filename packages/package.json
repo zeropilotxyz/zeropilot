@@ -1,0 +1,14 @@
+{
+  "name": "@zeropilot/packages",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "types",
+    "utils"
+  ],
+  "scripts": {
+    "build": "yarn workspaces run build",
+    "test": "yarn workspaces run test",
+    "lint": "yarn workspaces run lint"
+  }
+} 
