@@ -68,11 +68,11 @@ export default function Hero() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 text-white leading-tight"
           >
-            Control{" "}
+            Omnichain{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-300">
-              Any Chain
+              Control Hub
             </span>{" "}
-            from Solana
+            for Solana
           </motion.h1>
 
           <motion.p
@@ -81,8 +81,7 @@ export default function Hero() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="text-lg md:text-xl text-gray-300 mb-8 max-w-3xl"
           >
-            ZeroPilot is a smart wallet system that gives you the power to control and initiate transactions on multiple
-            blockchains—starting from a single base: Solana.
+            ZeroPilot is a comprehensive omnichain system that combines a smart wallet with powerful SDKs, enabling you to control assets and execute transactions across multiple blockchains—all from Solana as your control hub.
           </motion.p>
 
           <motion.div
@@ -118,18 +117,18 @@ export default function Hero() {
             {[
               {
                 icon: <Zap className="h-6 w-6 text-purple-400" />,
-                title: "High Speed",
-                description: "Execute transactions across chains with Solana's lightning-fast performance",
+                title: "Smart Wallet",
+                description: "Manage your assets across chains with our intuitive wallet interface",
               },
               {
                 icon: <Globe className="h-6 w-6 text-cyan-400" />,
-                title: "Omnichain Control",
-                description: "Manage your assets and interactions on any chain from a single interface",
+                title: "Developer SDKs",
+                description: "Integrate cross-chain functionality into your applications with our powerful SDKs",
               },
               {
                 icon: <Lock className="h-6 w-6 text-purple-400" />,
-                title: "Secure Messaging",
-                description: "LayerZero V2 ensures your cross-chain messages are secure and verifiable",
+                title: "LayerZero V2",
+                description: "Secure and efficient cross-chain messaging powered by LayerZero V2",
               },
             ].map((item, index) => (
               <motion.div

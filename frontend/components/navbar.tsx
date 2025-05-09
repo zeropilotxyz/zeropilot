@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Menu, X, ChevronRight, Rocket, ExternalLink } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import WaitlistModal from "./waitlist-modal"
+import Image from "next/image"
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
@@ -43,11 +44,10 @@ export default function Navbar() {
             <motion.div
               initial={{ rotate: 0 }}
               animate={{ rotate: 360 }}
-              transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, repeatType: "loop", ease: "linear" }}
-              className="relative w-10 h-10 flex items-center justify-center"
+              transition={{ duration: 5, repeat: Number.POSITIVE_INFINITY, repeatType: "loop", ease: "linear" }}
+              className="relative w-14 h-14 flex items-center justify-center"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-500 rounded-full opacity-70 blur-sm"></div>
-              <Rocket className="w-6 h-6 text-white relative z-10" />
+              <Image src="/logo/logo.png" alt="ZeroPilot Logo" width={80} height={80} />
             </motion.div>
             <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-cyan-400">
               ZeroPilot
