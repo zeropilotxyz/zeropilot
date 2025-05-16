@@ -15,7 +15,7 @@ export default function DashboardPage() {
               <Image src="/logo/logo.png" alt="ZeroPilot Logo" width={56} height={56} className="animate-spin-slow" />
             </div>
             <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-cyan-400">
-              ZeroPilottt
+              ZeroPilot
             </span>
           </div>
           <h1 className="text-2xl font-bold text-white">ZeroPilot Dashboard</h1>
