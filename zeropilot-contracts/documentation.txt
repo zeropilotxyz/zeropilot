@@ -1,0 +1,389 @@
+Solana OFTSolana OFT Create
+LayerZero V2 Solana OFT Create
+caution
+The Solana OFT, Endpoint, and ULN Programs are currently in Mainnet Beta!
+
+
+You should have already completed the steps in the Solana OFT Program Deploy page before continuing with this page.
+
+The Omnichain Fungible Token (OFT) Standard allows fungible tokens to be transferred across multiple blockchains without asset wrapping or middlechains.
+
+The Solana equivalent of this standard is the OFT Program.
+
+tip
+You should be familiar with the Solana Program Library and the Token-2022 program before continuing.
+
+The OFT Program
+The OFT Program interacts with the Solana Token Program to allow new or existing Fungible Tokens on Solana to transfer balances between different chains.
+
+info
+Solana now has two token programs. The original Token Program (commonly referred to as 'SPL token') and the newer Token-2022 program.
+
+LayerZero's OFT Standard introduces the OFT Store, a Program Derived Address (PDA) account responsible for storing your token's specific LayerZero configuration and enabling cross-chain transfers for Solana tokens.
+
+Solana Token Program
+
+Each OFT Store Account is managed by an OFT Program, which you would have already deployed in the previous step. To read more on the various programs and accounts involved in creating a Solana OFT, refer to the below section on the OFT Account Model.
+
+caution
+You will need to deploy your own OFT Program to start bridging your SPL Tokens.
+
+You can use the same OFT Program to create multiple Solana OFTs.
+
+info
+If using the same repo, you will need to rename the existing deployments/solana-<CLUSTER_NAME>/OFT.json as it will be overwritten otherwise. You will also need to either rename the existing layerzero.config.ts or use a different config file for the subsequent OFTs.
+
+OFT Account Model
+Before creating a new OFT, you should first understand the Solana Account Model which is used for the OFT Standard on Solana.
+
+The Solana OFT Standard uses 5 main accounts:
+
+Account Name	Executable	Description
+OFT Program	true	The OFT Program itself, the executable, stateless code which controls how OFTs interact with the LayerZero Endpoint and the SPL Token.
+Mint Account	false	This is the Mint Account for the OFT's SPL Token. Stores the key metadata for a specific token, such as total supply, decimal precision, mint authority, freeze authority and update authority.
+Mint Authority Multisig	false	A 1 of N Multisig that serves as the Mint Authority for the SPL Token. The OFT Store is always required as a signer. It's also possible to add additional signers.
+Escrow	false	The ** Token Account** for the corresponding Mint Account, owned by the OFT Store. For OFT Adapter deployments and also for storing fees, if fees are enabled. For both OFT and OFT Adapter, the Escrow address is part of the derivation for the OFT Store PDA.
+OFT Store	false	A PDA account that stores data about each OFT such as the underlying SPL Token Mint, the SPL Token Program, Endpoint Program, the OFT's fee structure, and extensions. Is the owner for the Escrow account. The OFT Store is a signer for the Mint Authority multisig.
+info
+The SPL Token Program handles all creation and management of SPL tokens on the Solana blockchain. An OFT's deployment interacts with this program to create the Mint Account.
+
+Creating a Solana OFT
+Mint Authority and Freeze Authority
+This section applies to regular OFTs and does not apply to OFT Adapters as the authorities are not changed in the case of an OFT Adapter.
+
+Before proceeding to create your OFT, you should understand the concepts of Mint Authority and Freeze Authority with regards to SPL tokens.
+
+If you require the ability to mint additional tokens (outside the context of cross-chain transfers), you will want to include the --additional-minters flag when you run the create script in the next section.
+
+If you don't require the ability to mint additional tokens, you will want to go with the --only-oft-store true flag.
+
+Running the Create OFT script
+info
+The examples below show how to integrate these scripts as Hardhat tasks, which is a common setup for many developers working with both EVM and non-EVM smart contracts in the same project.
+
+SOL is the 'native gas token' of Solana. All other tokens (fungible and non-fungible tokens (NFTs)), are called Solana Program Library (SPL) Tokens.
+
+You should also understand how to add your own Token Metadata before creating an OFT.
+
+The LayerZero CLI includes a hardhat script for creating OFTs and also OFT Adapters. For creation of regular OFTs, the create script will take care of creating a new SPL token. For creation of OFT Adapters, the create script will take in the existing SPL Token Mint Address as a parameter.
+
+As mentioned above, you have two options when creating your OFT, from the perspective of minting rights: Only OFT Store and Additional Minters. You will need to supply flags depending on your choice.
+
+info
+The eid 40168 below corresponds to Solana Devnet. To create on Solana Mainnet, change the eid value to 30168.
+
+Only OFT Store
+Additional Minters
+Mint-And-Burn Adapter (MABA)
+pnpm hardhat lz:oft:solana:create --eid 40168 --program-id <PROGRAM_ID> --only-oft-store true
+
+caution
+If you choose to go with --only-oft-store true, you will not be able to add in other signers/minters or update the Mint Authority, and the Freeze Authority will be immediately renounced. The token Mint Authority will be fixed Mint Authority Multisig address while the Freeze Authority will be set to None.
+
+Flags for the create script:
+
+--amount: The initial supply to mint on Solana (optional)
+--eid: Solana mainnet or testnet
+--localDecimals: Token local decimals (default = 9, optional)
+--sharedDecimals: OFT shared decimals (default = 6, optional)
+--name: Token Name (default = MockOFT)
+--mint: The Token mint public key (used for MABA only)
+--programId: The OFT Program ID
+--sellerFeeBasisPoints: Seller fee basis points (default = 0)
+--symbol: Token Symbol (default = MOFT)
+--tokenMetadataIsMutable: Token metadata is mutable (default = true)
+--additionalMinters: Comma-separated list of additional minters (optional)
+--onlyOftStore: If you plan to have only the OFTStore and no additional minters. This is not reversible and will result in losing the ability to mint new tokens by everything but the OFTStore (default = false, optional)
+--tokenProgram: The Token Program public key (used for MABA only, default = TOKEN_PROGRAM_ID.toBase58())
+--uri: URI for token metadata (default = empty string)
+--computeUnitPriceScaleFactor: The compute unit price scale factor (default = 4, optional)
+caution
+You should only mint additional tokens if this is your first canonical OFT supply (i.e., the first source of tokens across every chain). While OFT <-> OFT connections will handle additional token supplies without an issue, OFT <-> OFT Adapter connections will need to ensure that the total supply globally is equal to the lockbox supply in OFT Adapter.
+
+After the script successfully completes, you will get a file at deployments/solana-testnet/OFT.json that lists the addresses of all the accounts mentioned in OFT Account Model.
+
+You can now skip to the section Updating layerzero.config.ts.
+
+Creating a Solana OFT Adapter (adapt an existing SPL Token)
+This section applies if you have an existing SPL Token that you want to adapt into an OFT.
+
+For OFT Adapter, tokens will be locked when sending to other chains and unlocked when receiving from other chains.
+
+Running the Create OFT Adapter script
+info
+The eid 40168 below corresponds to Solana Devnet. To create on Solana Mainnet, change the eid value to 30168.
+
+pnpm hardhat lz:oft-adapter:solana:create --eid 40168 --program-id <PROGRAM_ID> --mint <TOKEN_MINT> --token-program <TOKEN_PROGRAM_ID>
+
+
+After the script successfully completes, you will get a file at deployments/solana-testnet/OFT.json that lists the addresses of all the accounts mentioned in OFT Account Model.
+
+warning
+There can only be one OFT Adapter used in an OFT deployment. Multiple OFT Adapters break omnichain unified liquidity by effectively creating token pools. If you create OFT Adapters on multiple chains, you have no way to guarantee finality for token transfers due to the fact that the source chain has no knowledge of the destination pool's supply (or lack of supply). This can create race conditions where if a sent amount exceeds the available supply on the destination chain, those sent tokens will be permanently lost.
+
+Updating layerzero.config.ts
+Setting enforcedOptions
+The LayerZero CLI makes use of the Simple Config Generator and includes enforcedOptions that will be applied when you run the wire command. For a send to work, it is required to have either enforcedOptions or extraOptions (provided in a send call). Since the example layerzero.config.ts applies enforcedOptions by default, you will not need to supply extraOptions when calling send.
+
+Before going to production, it is recommended to refer to the LayerZero Config Defaults to understand the right config parameters for specific pathways. For testing purposes, you may use the existing values in the layerzero.config.ts provided.
+
+Learn more about options at Message Execution Options
+
+Optional: Setting New Delegate
+During OFT Initialization, you have the opportunity to set a delegate. This address will have the ability to implement custom configurations such as setting DVNs, Executors, and message debugging functions such as skipping inbound packets. You will also be able to set a delegate address after the OFT has been initialized and configured.
+
+To set a delegate, modify the config object in layerzero.config.ts as follows:
+
+const config: OAppOmniGraphHardhat = {
+    contracts: [
+        {
+            contract: sepoliaContract,
+        },
+        {
+            contract: solanaContract,
+            config: {
+                delegate: '<DELEGATE_ADDRESS_HERE>',
+            }
+        },
+    ],
+    ... // the rest of the config object
+
+The change in delegate will take effect when you run the wiring step.
+
+Initializing the Solana OFT
+caution
+Do this only when initializing the OFT for the first time. The only exception is if a new pathway is added later. If so, run this again to properly initialize the pathway.
+
+This script inits the config on the Solana side, which is necessary given the self-ownership model for Solana OFTs.
+
+pnpm hardhat lz:oft:solana:init-config --oapp-config layerzero.config.ts
+
+Configuring LayerZero Contracts/Program
+LayerZero contracts have unique configurations on a per pathway basis (i.e., from A to B has different properties than from B to A).
+
+tip
+This guide assumes you already have deployed other OFT Instances on your desired EVM or other non-EVM chains. If you have not deployed any other OFT contracts yet, see the OFT Quickstart in the EVM section.
+
+Now that you have deployed your Solana OFT, you will need to connect the OFT Instance to your other chains.
+
+While LayerZero provides default configuration settings for most pathways, you should only connect your OFT Instances on different chains after viewing your DVN and Executor Configuration Settings.
+
+Your configurations are set via the layerzero.config.ts file.
+
+Once you've finished selecting and preparing your configurations, you can activate them by running the wiring script.
+
+pnpm hardhat lz:oapp:wire --oapp-config layerzero.config.ts
+
+This script will check all the configurations for each pathway, ask you if you would like to preview the transactions, show the transaction details before execution, and execute the transactions when you confirm.
+
+Under the hood, the wiring script takes care of calling methods such as setPeer, which handles the allowlisting of the messaging of OApps cross-chain, which enables OFTs. The wiring script will also create and execute transactions to set the on-chain configs to match the layerzero.config.ts. For example, changing owners and delegates can also be done by updating the layerzero.config.ts file, and then running the wiring script.
+
+caution
+setPeer opens your OFT to start receiving messages from the address set, meaning you should configure any application settings you intend on changing prior to calling setPeer.
+
+
+warning
+OFTs need setPeer to be called correctly on both Chain A and Chain B to send and receive messages. The peer address uses bytes32 for handling non-EVM destination chains.
+
+If the peer has been set to an incorrect destination address, your messages will not be delivered and handled properly. If not resolved, users can burn source funds without a corresponding mint on destination. You can confirm the peer address is the expected destination OFT address by using the isPeer function.
+
+
+Message Execution Options
+_options are a generated bytes array with specific instructions for the DVNs and Executor to when handling cross-chain messages.
+
+Note that you must have at least either enforcedOptions set for your OApp or extraOptions passed in for a particular transaction. If both are absent, the transaction will fail. For sends from EVM chains, quoteSend() will revert. For sends from Solana, you will see a ZeroLzReceiveGasProvided error.
+
+In a previous section, we already went through how to set enforcedOptions, so in this section we'll show you how to generate _options to pass through as extraOptions.
+
+If you had already set enforcedOptions, then you can pass an empty bytes array (0x if sending from EVM, Buffer.from('') if sending from Solana) and skip forward to Estimating Fees and Calling Send.
+
+If you did not set enforcedOptions, then continue reading.
+
+Setting Extra Options
+Any _options passed in the send call itself is considered as _extraOptions.
+
+_extraOptions can specify additional handling within the same message type. These _options will then be combined with enforcedOption if set.
+
+You can find how to generate all the available _options in Solana Execution Gas Options, but for this tutorial you should focus primarily on using @layerzerolabs/lz-v2-utilities, specifically the Options class.
+
+info
+As outlined above, decide on whether you need an application wide option via enforcedOptions or a call specific option using extraOptions. Be specific in what _options you use for both parameters, as your transactions will reflect the exact settings you implement.
+
+caution
+Your enforcedOptions will always be charged to a user when calling send. Any extraOptions passed in the send call will be charged on top of the enforced settings.
+
+Passing identical _options in both enforcedOptions and extraOptions will charge the caller twice on the source chain, because LayerZero interprets duplicate _options as two separate requests for gas.
+
+Setting Enforced Options Inbound to EVM chains
+A typical OFT's lzReceive call and mint will use 60000 gas on most EVM chains, so you can enforce this option to require callers to pay a 60000 gas limit in the source chain transaction to prevent out of gas issues on destination.
+
+To pass in extraOptions for Solana to EVM (Sepolia, in our example) transactions, modify tasks/solana/sendOFT.ts
+
+Refer to the sample code diff below:
+
+import {addressToBytes32, Options} from '@layerzerolabs/lz-v2-utilities';
+// ...
+// add the following 3 lines anywhere before the `oft.quote()` call
+const GAS_LIMIT = 60_000 // Gas limit for the executor
+const MSG_VALUE = 0 // msg.value for the lzReceive() function on destination in wei
+const _options = Options.newOptions().addExecutorLzReceiveOption(GAS_LIMIT, MSG_VALUE)
+// ...
+// replace the options value in oft.quote()
+const { nativeFee } = await oft.quote(
+    umi.rpc,
+    {
+        payer: umiWalletSigner.publicKey,
+        tokenMint: mint,
+        tokenEscrow: umiEscrowPublicKey,
+    },
+    {
+        payInLzToken: false,
+        to: Buffer.from(recipientAddressBytes32),
+        dstEid: toEid,
+        amountLd: BigInt(amount),
+        minAmountLd: 1n,
+        options: _options.toBytes(), // <--- here
+        composeMsg: undefined,
+    },
+// ...
+// replace the options value in oft.send()
+    const ix = await oft.send(
+        umi.rpc,
+        {
+            payer: umiWalletSigner,
+            tokenMint: mint,
+            tokenEscrow: umiEscrowPublicKey,
+            tokenSource: tokenAccount[0],
+        },
+        {
+            to: Buffer.from(recipientAddressBytes32),
+            dstEid: toEid,
+            amountLd: BigInt(amount),
+            minAmountLd: (BigInt(amount) * BigInt(9)) / BigInt(10),
+            options: _options.toBytes(), // <--- here
+            composeMsg: undefined,
+            nativeFee,
+        },
+// ...
+
+We will call this script later in Estimating Fees and Calling Send.
+
+tip
+ExecutorLzReceiveOption specifies a quote paid in advance on the source chain by the msg.sender for the equivalent amount of native gas to be used on the destination chain. If the actual cost to execute the message is less than what was set in _options, there is no default way to refund the sender the difference. Application developers need to thoroughly profile and test gas amounts to ensure consumed gas amounts are correct and not excessive.
+
+Setting Enforced Options Inbound to Solana
+For sends to Solana, you must recommend that you set at minimum 0.0025 SOL (2_500_000 lamports) in your lzReceiveOption when sending to Solana. If setting enforcedOptions via layerzero.config.ts, this parameter is referred to as value. When using the OptionsBuilder in Typescript, this is the second parameter to the addExecutorLzReceiveOption call. The absolute minimum value is 1_500_000 ,but at this figure, transactions may still fail, so we recommend 2_500_000 instead to have some buffer on top.
+
+info
+Unlike EVM addresses, every Solana Account requires a minimum balance of the native gas token to exist rent free. To send tokens to Solana, you will need a minimum amount of lamports to execute and initialize the account within the transaction.
+
+To pass in extraOptions for the send from EVM (Sepolia, in our example) to Solana, modify tasks/evm/send.ts
+
+import {Options} from '@layerzerolabs/lz-v2-utilities';
+// ...
+// add the following 3 lines anywhere before the sendParam declaration
+const GAS_LIMIT = 200_000; // Gas (Compute Units in Solana) limit for the executor
+const MSG_VALUE = 2_500_000; // msg.value for the lzReceive() function on destination in lamports
+const _options = Options.newOptions().addExecutorLzReceiveOption(GAS_LIMIT, MSG_VALUE);
+// ...
+// replace the extraOptions value in sendParam
+const sendParam = {
+  dstEid,
+  to: makeBytes32(bs58.decode(to)),
+  amountLD: amountLD.toString(),
+  minAmountLD: amountLD.mul(9_000).div(10_000).toString(),
+  extraOptions: _options.toHex(), // <-- here
+  composeMsg: '0x',
+  oftCmd: '0x',
+};
+
+
+We will call this script in the next section.
+
+Estimating Fees and Calling Send
+Both send scripts take care of fees estimation, which is done via quote()/quoteSend() calls on the OApp.
+
+For reference, in tasks/solana/sendOFT.ts:
+
+const { nativeFee } = await oft.quote(
+    umi.rpc,
+    {
+        payer: umiWalletSigner.publicKey,
+        tokenMint: mint,
+        tokenEscrow: umiEscrowPublicKey,
+    },
+
+In tasks/evm/send.ts:
+
+const [msgFee] = await token.functions.quoteSend(sendParam, false)
+
+Now, we can proceed to sending our OFT across chains.
+
+From Solana Devnet to Sepolia:
+
+pnpm hardhat lz:oft:solana:send --amount <AMOUNT> --from-eid 40168 --to <TO> --to-eid 40161
+
+From Sepolia to Solana Devnet:
+
+pnpm hardhat --network sepolia-testnet send --dst-eid 40168 --amount <AMOUNT> --to <TO>
+
+Congratulations! You've now unlocked the power of cross-chain transfers (without asset-wrapping or middlechains) through OFTs.
+
+Additional Information
+Token Supply Cap
+When transferring tokens across different blockchain VMs, each chain may have a different level of decimal precision for the smallest unit of a token.
+
+While EVM chains support uint256 for token balances, Solana uses uint64. Because of this, the default OFT Standard has a max token supply (2^64 - 1)/(10^6), or 18,446,744,073,709.551615.
+
+info
+If your token's supply needs to exceed this limit, you'll need to override the shared decimals value.
+
+Optional: Overriding sharedDecimals
+This shared decimal precision is essentially the maximum number of decimal places that can be reliably represented and handled across different blockchain VMs when transferring tokens.
+
+By default, an OFT has 6 sharedDecimals, which is optimal for most ERC20 use cases that use 18 decimals.
+
+// @dev Sets an implicit cap on the amount of tokens, over uint64.max() will need some sort of outbound cap / totalSupply cap
+// Lowest common decimal denominator between chains.
+// Defaults to 6 decimal places to provide up to 18,446,744,073,709.551615 units (max uint64).
+// For tokens exceeding this totalSupply(), they will need to override the sharedDecimals function with something smaller.
+// ie. 4 sharedDecimals would be 1,844,674,407,370,955.1615
+const OFT_DECIMALS = 6;
+
+
+To modify this default, simply change the OFT_DECIMALS to another value during deployment.
+
+caution
+Shared decimals also control how token transfer precision is calculated.
+
+Token Transfer Precision
+The OFT Standard also handles differences in decimal precision before every cross-chain transfer by "cleaning" the amount from any decimal precision that cannot be represented in the shared system.
+
+The OFT Standard defines these small token transfer amounts as "dust".
+
+Example
+ERC20 OFTs use a local decimal value of 18 (the norm for ERC20 tokens), and a shared decimal value of 6 (the norm for Solana tokens).
+
+decimalConversionRate = 10^(localDecimals − sharedDecimals) = 10^(18−6) = 10^12
+
+This means the conversion rate is 10^12, which indicates the smallest unit that can be transferred is 10^-12 in terms of the token's local decimals.
+
+For example, if you send a value of 1234567890123456789 (a token amount with 18 decimals), the OFT Standard will:
+
+Divides by decimalConversionRate:
+1234567890123456789 / 10^12 = 1234567.890123456789 = 1234567
+
+tip
+Remember that solidity performs integer arithmetic. This means when you divide two integers, the result is also an integer with the fractional part discarded.
+
+
+Multiplies by decimalConversionRate:
+1234567 * 10^12 = 1234567000000000000
+
+This process removes the last 12 digits from the original amount, effectively "cleaning" the amount from any "dust" that cannot be represented in a system with 6 decimal places.
+
+Adding Send and Receive Logic
+In Solana, the concept of function overrides as commonly understood in object-oriented languages like Solidity does not directly apply. Because of this, to change or add any custom business logic to the token, you will need to deploy your own variant of the OFT Program.
+
+For more information, visit the OFT Program Library.
+
