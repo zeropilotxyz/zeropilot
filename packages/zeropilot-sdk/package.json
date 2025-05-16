@@ -1,0 +1,18 @@
+{
+  "name": "zeropilot-sdk",
+  "version": "0.1.0",
+  "description": "TypeScript SDK for ZeroPilot cross-chain single wallet experience.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint src --ext .ts,.tsx",
+    "test": "echo \"No tests yet\""
+  },
+  "author": "ZeroPilot Team",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+} 
