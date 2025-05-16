@@ -99,6 +99,11 @@ export default function Hero() {
                 <ExternalLink className="ml-2 h-4 w-4" />
               </Button>
             </Link>
+            <Link href="/docs">
+              <Button size="lg" variant="outline" className="border-cyan-400 text-cyan-200 hover:bg-cyan-400/10">
+                Docs
+              </Button>
+            </Link>
             <WaitlistModal
               trigger={
                 <Button size="lg"  className="border-purple-500 text-white hover:bg-purple-500/20">
