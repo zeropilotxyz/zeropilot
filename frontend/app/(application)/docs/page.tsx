@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { BookOpen, Layers, Code2, Rocket, ArrowRight, Wallet, Zap, Globe, Lock, FileText } from "lucide-react";
 
@@ -5,8 +6,14 @@ export default function DocsPage() {
   return (
     <div className="max-w-4xl mx-auto py-16 px-6 md:px-12">
       <div className="flex items-center gap-4 mb-8">
-        <BookOpen className="w-10 h-10 text-cyan-400" />
-        <h1 className="text-5xl font-extrabold text-white tracking-tight">ZeroPilot Documentation</h1>
+        <div className="relative w-14 h-14 flex items-center justify-center">
+          <Image src="/logo/logo.png" alt="ZeroPilot Logo" width={56} height={56} className="animate-spin-slow" />
+        </div>
+        <span className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-cyan-400">
+          ZeroPilot
+        </span>
+        <BookOpen className="w-10 h-10 text-cyan-400 ml-2" />
+        <h1 className="text-5xl font-extrabold text-white tracking-tight">Documentation</h1>
       </div>
       <p className="mb-12 text-xl text-cyan-100 max-w-2xl">
         ZeroPilot is a cross-chain wallet and protocol layer, enabling seamless asset management and swaps between Solana and EVM chains using LayerZero V2. It features a unified SDK for developers and a beautiful dashboard for users.

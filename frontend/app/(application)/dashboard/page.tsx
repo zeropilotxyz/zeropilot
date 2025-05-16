@@ -3,13 +3,24 @@
 import { WalletConnect } from "@/components/wallet-connect"
 import { SwapInterface } from "@/components/swap-interface"
 import { Toaster } from "sonner"
+import Image from "next/image"
 
 export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-black">
       <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-col items-center mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="relative w-14 h-14 flex items-center justify-center">
+              <Image src="/logo/logo.png" alt="ZeroPilot Logo" width={56} height={56} className="animate-spin-slow" />
+            </div>
+            <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-cyan-400">
+              ZeroPilottt
+            </span>
+          </div>
           <h1 className="text-2xl font-bold text-white">ZeroPilot Dashboard</h1>
+        </div>
+        <div className="flex justify-between items-center mb-8">
           <WalletConnect />
         </div>
         

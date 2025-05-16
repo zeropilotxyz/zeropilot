@@ -1,7 +1,7 @@
 import type React from "react"
 import type { Metadata } from "next"
 import Link from "next/link"
-import { Rocket } from "lucide-react"
+import Image from "next/image"
 import { LayerZeroIcon } from "@/components/icons/layerzero-icon"
 
 export const metadata: Metadata = {
@@ -16,9 +16,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <header className="border-b border-white/10 bg-black/80 backdrop-blur-lg sticky top-0 z-50">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
-            <div className="relative w-8 h-8 flex items-center justify-center">
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-500 rounded-full opacity-70 blur-sm"></div>
-              <Rocket className="w-5 h-5 text-white relative z-10" />
+            <div className="relative w-10 h-10 flex items-center justify-center">
+              <Image src="/logo/logo.png" alt="ZeroPilot Logo" width={40} height={40} className="animate-spin-slow" />
             </div>
             <span className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-cyan-400">
               ZeroPilot
